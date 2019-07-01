@@ -1,6 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
+const md5 = require('blueimp-md5')
+const {UserModel} = require('../db/models.js')
+const filter = {password: 0, __v: 0} //定义一个过滤器
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -27,27 +31,81 @@ router.get('/', function(req, res, next) {
  * res：返回相应
  * next:
  */
+// router.post('/register', function(req, res) {
+//   // 1.获取请求参数
+//   const {username, password} = req.body
+//   // 2.处理
+//   if(username === 'admin'){
+//     // 返回失败的响应数据
+//     res.send({
+//       code: 1,
+//       msg: '此用户名已存在'
+//     })
+//   }else{
+//     // 返回成功的数据
+//     res.send({
+//       code: 0,
+//       data: {
+//         id: '1',
+//         username,
+//         password
+//       }
+//     })
+//   }
+// })
+
+// 注册的路由
 router.post('/register', function(req, res) {
-  // 1.获取请求参数
+  // 读取请求参数数据
+  const {username, password, type} = req.body
+  // 处理
+    // 判断用户是否已经存在
+  UserModel.findOne({username}, function(error, user){
+    // 如果有值，已存在
+    if(user){
+      // 返回错误信息
+      res.send({
+        code: 1,
+        msg: '此用户名已存在'
+      })
+    }else{
+      // 保存数据
+      new UserModel({username, type, password:md5(password)}).save(function(error, user){
+        // 生成cookie ,病娇给浏览器保存,设置cookie的有效时间
+        res.cookie('userid', user._id, {maxAge: 1000*60*60*24*7})
+        // 响应数据中不包含密码
+        const data = {username, type, _id: user._id}
+        res.send({
+          code: 0,
+          data
+        })
+      })
+    }
+  })
+  // 返回响应数据
+
+})
+
+// 登录的路由
+router.post('/login', function(req, res){
   const {username, password} = req.body
-  // 2.处理
-  if(username === 'admin'){
-    // 返回失败的响应数据
-    res.send({
-      code: 1,
-      msg: '此用户名已存在'
-    })
-  }else{
-    // 返回成功的数据
-    res.send({
-      code: 0,
-      data: {
-        id: '1',
-        username,
-        password
-      }
-    })
-  }
+  // 根据username和password查询数据库users
+  UserModel.findOne({username,password:md5(password)},filter,function(err, user){
+    if(user){
+      // 生成cookie ,病娇给浏览器保存,设置cookie的有效时间
+      res.cookie('userid', user._id, {maxAge: 1000*60*60*24*7})
+      // 返回信息
+      res.send({
+        code: 0,
+        data: user
+      })
+    }else{
+      res.send({
+        code: 1,
+        msg: '用户名或密码错误！'
+      })
+    }
+  })
 })
 
 module.exports = router;
