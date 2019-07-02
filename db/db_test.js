@@ -38,7 +38,7 @@ function testSave() {
   const userModel = new UserModel({
     username: '222',
     password: md5('123'),
-    type: 'yonghu'
+    type: 'user'
   })
   // 调用save()保存
   userModel.save(function(error, user) {
@@ -81,4 +81,3 @@ function testDelete() {
 testDelete()
 // { n: 1, ok: 1, deletedCount: 1 }
 // n:1/0, deletedCount: 删除的条数
-
