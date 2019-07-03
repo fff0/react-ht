@@ -33,3 +33,17 @@ const UserModel = mongoose.model('user', userSchema)
 // 2.3 向外暴露 Model
     // 分开暴露
     exports.UserModel = UserModel
+
+
+//定义聊天的集合
+const chatSchema = mongoose.Schema({
+  from: {type: String, require: true},// 发送用户的id
+  to: {type: String, require: true},// 接收用户的id
+  chat_id: {type: String, require: true}, //from 和 to 组成的字符串
+  read: {type: Boolean, default: false}, // 标识是否已读
+  create_time: {type: Number} // 创建时间
+})
+// 定义能操作chats 集合的数据Model
+const ChatModel = mongoose.model('chat', chatSchema)
+// 向外暴露Model
+exports.ChatModel = ChatModel
