@@ -171,7 +171,7 @@ router.get('/msglist', function(req, res){
     //   }
     // })
 
-    const user = userDocs.reduce((users, user) => {
+    const users = userDocs.reduce((users, user) => {
       users[user._id] = {
         username: user.username,
         header: user.header

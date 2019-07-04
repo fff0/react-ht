@@ -40,6 +40,7 @@ const chatSchema = mongoose.Schema({
   from: {type: String, require: true},// 发送用户的id
   to: {type: String, require: true},// 接收用户的id
   chat_id: {type: String, require: true}, //from 和 to 组成的字符串
+  content: {type: String, require: true},// 接收的内容
   read: {type: Boolean, default: false}, // 标识是否已读
   create_time: {type: Number} // 创建时间
 })
